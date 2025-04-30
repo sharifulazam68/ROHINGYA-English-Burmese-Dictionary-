@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rohingya-English-Burmese Dictionary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef6f9;
+      margin: 30px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    #searchInput {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin: 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #2980b9;
+      color: white;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .speak-btn {
+      background-color: #3498db;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #uploadSection, #addWordSection {
+      margin: 20px 0;
+      padding: 20px;
+      background-color: #dff0d8;
+      border: 1px dashed #2c3e50;
+    }
+    input[type="text"] {
+      padding: 8px;
+      margin: 5px;
+      width: 20%;
+    }
+    button {
+      margin-top: 10px;
+    }
+
+    #musicButton {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    #musicButton:hover {
+      background-color: #3498db;
+      transform: scale(1.05);
+    }
+
+    #musicButton:active {
+      background-color: #2980b9;
+      transform: scale(1);
+    }
+
+    #volumeControl {
+      width: 200px;
+      margin: 10px 0;
+    }
+
+    select {
+      padding: 8px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+    }
+
+    label {
+      font-size: 16px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <audio id="backgroundMusic" loop autoplay>
+    <source src="calm.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
+  <h1>Rohingya-English-Burmese Dictionary</h1>
+
+  <input type="text" id="searchInput" placeholder="Search for a word..." onkeyup="searchTable()">
+
+  <div id="uploadSection">
+    <h3>Upload Rohingya/English/Burmese Books (PDF, TXT)</h3>
+    <input type="file" id="bookUpload" multiple accept=".pdf,.txt" onchange="handleUpload()">
+    <p id="uploadMessage"></p>
+  </div>
+
+  <div id="addWordSection">
+    <h3>Add a New Word</h3>
+    <input type="text" id="newRohingya" placeholder="Rohingya">
+    <input type="text" id="newEnglish" placeholder="English">
+    <input type="text" id="newBurmese" placeholder="Burmese">
+    <button onclick="addWord()">Add Word</button>
+  </div>
+
+  <button id="musicButton" onclick="toggleMusic()">Pause Music</button>
+  <label for="volumeControl">Volume: </label>
+  <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.5" onchange="adjustVolume()">
+
+  <label for="musicGenre">Select Music Genre: </label>
+  <select id="musicGenre" onchange="changeMusic()">
+    <option value="calm">Calm</option>
+    <option value="energetic">Energetic</option>
+    <option value="focus">Focus</option>
+  </select>
+
+  <table id="dictionaryTable">
+    <thead>
+      <tr>
+        <th>Word</th>
+        <th>Rohingya</th>
+        <th>English</th>
+        <th>Burmese</th>
+        <th>Speak</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>kitab</td>
+        <td>kitab</td>
+        <td>book</td>
+        <td>စာအုပ်</td>
+        <td><button class="speak-btn" onclick="speak('book')">Speak</button></td>
+      </tr>
+      <tr>
+        <td>maya</td>
+        <td>maya</td>
+        <td>girl</td>
+        <td>မိန်းကလေး</td>
+        <td><button class="speak-btn" onclick="speak('girl')">Speak</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    function searchTable() {
+      const input = document.getElementById("searchInput");
+      const filter = input.value.toLowerCase();
+      const table = document.getElementById("dictionaryTable");
+      const trs = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < trs.length; i++) {
+        const tds = trs[i].getElementsByTagName("td");
+        let show = false;
+        for (let j = 0; j < tds.length - 1; j++) {
+          if (tds[j].textContent.toLowerCase().includes(filter)) {
+            show = true;
+            break;
+          }
+        }
+        trs[i].style.display = show ? "" : "none";
+      }
+    }
+
+    function speak(word) {
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
+    function handleUpload() {
+      const files = document.getElementById('bookUpload').files;
+      const message = document.getElementById('uploadMessage');
+      let fileNames = [];
+      for (let i = 0; i < files.length; i++) {
+        fileNames.push(files[i].name);
+      }
+      message.textContent = "Uploaded: " + fileNames.join(', ');
+    }
+
+    function addWord() {
+      const roh = document.getElementById('newRohingya').value.trim();
+      const eng = document.getElementById('newEnglish').value.trim();
+      const bur = document.getElementById('newBurmese').value.trim();
+
+      if (roh && eng && bur) {
+        const table = document.getElementById('dictionaryTable').getElementsByTagName('tbody')[0];
+        const row = table.insertRow();
+        row.innerHTML = `<td>${roh}</td><td>${roh}</td><td>${eng}</td><td>${bur}</td><td><button class="speak-btn" onclick="speak('${eng}')">Speak</button></td>`;
+        document.getElementById('newRohingya').value = '';
+        document.getElementById('newEnglish').value = '';
+        document.getElementById('newBurmese').value = '';
+      } else {
+        alert("Please fill in all fields.");
+      }
+    }
+
+    function toggleMusic() {
+      const music = document.getElementById('backgroundMusic');
+      const musicButton = document.getElementById('musicButton');
+      
+      if (music.paused) {
+        music.play();
+        musicButton.textContent = "Pause Music";
+      } else {
+        music.pause();
+        musicButton.textContent = "Play Music";
+      }
+    }
+
+    function adjustVolume() {
+      const volume = document.getElementById('volumeControl').value;
+      const music = document.getElementById('backgroundMusic');
+      music.volume = volume;
+    }
+
+    function changeMusic() {
+      const music = document.getElementById('backgroundMusic');
+      const genre = document.getElementById('musicGenre').value;
+      
+      // Stop current music
+      music.pause();
+      
+      // Change music source based on selected genre
+      if (genre === 'calm') {
+        music.src = 'calm.mp3'; // Replace with the path to your calm music
+      } else if (genre === 'energetic') {
+        music.src = 'energetic.mp3'; // Replace with the path to your energetic music
+      } else if (genre === 'focus') {
+        music.src = 'focus.mp3'; // Replace with the path to your focus music
+      }
+      
+      // Play the new music
+      music.play();
+    }
+  </script>
+</body>
+</html>
